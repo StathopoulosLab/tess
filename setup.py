@@ -32,7 +32,7 @@ try:
 except ImportError:
     cythonize = None
 
-extension_version = "0.3.1"
+extension_version = "0.3.1a"
 
 if cythonize is not None:
     print("Building with Cython.")

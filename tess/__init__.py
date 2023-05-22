@@ -17,7 +17,8 @@ Example
     [13.5, 13.5]
 """
 
-from ._voro import Container as _Container, ContainerPoly as _ContainerPoly, Cell
+from ._voro import (Container as _Container, ContainerDodecahedral as _ContainerDodecahedral,
+                    ContainerPoly as _ContainerPoly, Cell)
 
 
 class Container(list):
@@ -73,7 +74,8 @@ class Container(list):
         R_{j}^{2}\forall j\neq i
     """
 
-    def __init__(self, points, limits=1.0, periodic=False, radii=None, blocks=None):
+    def __init__(self, points, trackIDs = None, limits=1.0, periodic=False,
+                 radii=None, blocks=None, dodecahedralWalls=False):
         """Get the voronoi cells for a given set of points."""
         # make px, py, pz from periodic, whether periodic is a 3-tuple or bool
         try:
@@ -140,6 +142,9 @@ class Container(list):
         # Container is for no-radii.
         # Now we choose the right one.
         if radii is not None:
+            if dodecahedralWalls:
+                raise NotImplementedError("Can't use ContainerPoly with dodecahedral walls yet")
+
             assert len(radii) == len(points)
             self._container = _ContainerPoly(
                 lx0,
@@ -164,7 +169,7 @@ class Container(list):
                         roundedoff(y, ly0, Ly, py),
                         roundedoff(z, lz0, Lz, pz),
                     )
-                    self._container.put(n, rx, ry, rz, r)
+                    self._container.put(trackIDs[n] if trackIDs else n, rx, ry, rz, r)
                 except AssertionError:
                     raise ValueError(
                         "Could not insert point {} at ({}, {}, {}): point not inside the box.".format(
@@ -172,22 +177,40 @@ class Container(list):
                         )
                     )
         else:
-            # no radii => use voro._Container
-            self._container = _Container(
-                lx0,
-                lx,
-                ly0,
-                ly,
-                lz0,
-                lz,  # limits
-                bx,
-                by,
-                bz,  # block size
-                px,
-                py,
-                pz,  # periodicity
-                8,   # the initial memory allocation for each block
-            )
+            # no radii => use voro._Container or voro._ContainerDodecahedral
+            if dodecahedralWalls:
+                self._container = _ContainerDodecahedral(
+                    lx0,
+                    lx,
+                    ly0,
+                    ly,
+                    lz0,
+                    lz,  # limits
+                    bx,
+                    by,
+                    bz,  # block size
+                    px,
+                    py,
+                    pz,  # periodicity
+                    8,   # the initial memory allocation for each block
+                )
+
+            else:
+                self._container = _Container(
+                    lx0,
+                    lx,
+                    ly0,
+                    ly,
+                    lz0,
+                    lz,  # limits
+                    bx,
+                    by,
+                    bz,  # block size
+                    px,
+                    py,
+                    pz,  # periodicity
+                    8,   # the initial memory allocation for each block
+                )
             for n, (x, y, z) in enumerate(points):
                 rx, ry, rz = (
                     roundedoff(x, lx0, Lx, px),
@@ -195,7 +218,7 @@ class Container(list):
                     roundedoff(z, lz0, Lz, pz),
                 )
                 try:
-                    self._container.put(n, rx, ry, rz)
+                    self._container.put(trackIDs[n] if trackIDs else n, rx, ry, rz)
                 except AssertionError:
                     raise ValueError(
                         "Could not insert point {} at ({}, {}, {}): point not inside the box.".format(
@@ -218,7 +241,7 @@ You may want to check that all points are within the box, and none are overlappi
     def get_walls(self):
         """
         Get the size of the box.
-        
+
         Returns
         -------
         limits : two 3-tuples of float

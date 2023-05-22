@@ -12,6 +12,7 @@
 
 #include <cstdio>
 #include <vector>
+#include <memory>
 
 #include "config.hh"
 #include "common.hh"
@@ -646,6 +647,60 @@ class container : public container_base, public radius_mono
   private:
 	voro_compute<container> vc;
 	friend class voro_compute<container>;
+};
+
+/** \brief Extension of the container class that instantiates dodecahedral
+ * walls the clip cells against.
+ *
+ * This class is an extension of the container class.  The only difference is
+ * at construction time. */
+class container_dodecahedral : public container
+{
+  public:
+// Create a wall class that, whenever called, will replace the Voronoi cell
+// with a prescribed shape, in this case a dodecahedron
+	class wall_dodecahedral : public wall {
+		public:
+			const double Phi=0.5*(1+sqrt(5.0));
+			wall_dodecahedral() {
+
+				// Create a dodecahedron
+				v.init(-20,20,-20,20,-20,20);
+				v.plane(0,20*Phi,20);
+				v.plane(0,-20*Phi,20);
+				v.plane(0,20*Phi,-20);
+				v.plane(0,-20*Phi,-20);
+				v.plane(20,0,20*Phi);
+				v.plane(-20,0,20*Phi);
+				v.plane(20,0,-20*Phi);
+				v.plane(-20,0,-20*Phi);
+				v.plane(20*Phi,20,0);
+				v.plane(-20*Phi,20,0);
+				v.plane(20*Phi,-20,0);
+				v.plane(-20*Phi,-20,0);
+			};
+			bool point_inside(double x,double y,double z) {return true;}
+			bool cut_cell(voronoicell &c,double x,double y,double z) {
+
+				// Set the cell to be equal to the dodecahedron
+				c=v;
+				return true;
+			}
+			bool cut_cell(voronoicell_neighbor &c,double x,double y,double z) {
+
+				// Set the cell to be equal to the dodecahedron
+				c=v;
+				return true;
+			}
+		private:
+			voronoicell v;
+	};
+
+	container_dodecahedral(double ax_, double bx_, double ay_, double by_, double az_, double bz_,
+			  int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem);
+
+	private:
+		std::shared_ptr<wall_dodecahedral> w;
 };
 
 /** \brief Extension of the container_base class for computing radical Voronoi

@@ -85,6 +85,15 @@ container::container(double ax_, double bx_, double ay_, double by_, double az_,
  *                                               container is periodic in each
  *                                               coordinate direction.
  * \param[in] init_mem the initial memory allocation for each block. */
+
+container_dodecahedral::container_dodecahedral(double ax_, double bx_, double ay_, double by_, double az_, double bz_,
+					 int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem)
+	: container(ax_, bx_, ay_, by_, az_, bz_, nx_, ny_, nz_, xperiodic_, yperiodic_, zperiodic_, init_mem)
+{
+	w.reset(new wall_dodecahedral());
+	add_wall(dynamic_cast<wall *>(w.get()));
+}
+
 container_poly::container_poly(double ax_, double bx_, double ay_, double by_, double az_, double bz_,
 							   int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem)
 	: container_base(ax_, bx_, ay_, by_, az_, bz_, nx_, ny_, nz_, xperiodic_, yperiodic_, zperiodic_, init_mem, 4),
