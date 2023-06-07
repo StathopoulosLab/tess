@@ -24,7 +24,7 @@ cdef extern from "voro++.hh" namespace "voro":
     cdef cppclass container_dodecahedral:
         double ax, ay, az, bx, by, bz
         container_dodecahedral(double,double,double,double,double,double,
-                int,int,int,cbool,cbool,cbool,int) except +
+                int,int,int,cbool,cbool,cbool,int,double) except +
         cbool compute_cell(voronoicell_neighbor &c,c_loop_all &vl)
         cbool point_inside(double,double,double)
         cbool put(int, double, double, double)
@@ -274,9 +274,9 @@ cdef class Container:
 cdef class ContainerDodecahedral:
     cdef container_dodecahedral *thisptr
     def __cinit__(self, double ax_,double bx_,double ay_,double by_,double az_,double bz_,
-                int nx_,int ny_,int nz_,cbool xperiodic_,cbool yperiodic_,cbool zperiodic_,int init_mem):
+                int nx_,int ny_,int nz_,cbool xperiodic_,cbool yperiodic_,cbool zperiodic_,int init_mem, double radius):
         self.thisptr = new container_dodecahedral(ax_, bx_, ay_, by_, az_, bz_, nx_, ny_, nz_,
-                xperiodic_, yperiodic_, zperiodic_, init_mem)
+                xperiodic_, yperiodic_, zperiodic_, init_mem, radius)
 
     def __dealloc__(self):
         del self.thisptr

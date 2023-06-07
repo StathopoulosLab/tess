@@ -75,7 +75,7 @@ class Container(list):
     """
 
     def __init__(self, points, trackIDs = None, limits=1.0, periodic=False,
-                 radii=None, blocks=None, dodecahedralWalls=False):
+                 radii=None, blocks=None, dodecahedralWalls=False, cell_radius: float = 20.):
         """Get the voronoi cells for a given set of points."""
         # make px, py, pz from periodic, whether periodic is a 3-tuple or bool
         try:
@@ -193,6 +193,7 @@ class Container(list):
                     py,
                     pz,  # periodicity
                     8,   # the initial memory allocation for each block
+                    cell_radius  # "radius" of dodecahedral cell walls of container
                 )
 
             else:

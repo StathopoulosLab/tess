@@ -662,22 +662,22 @@ class container_dodecahedral : public container
 	class wall_dodecahedral : public wall {
 		public:
 			const double Phi=0.5*(1+sqrt(5.0));
-			wall_dodecahedral() {
+			wall_dodecahedral(double radius) {
 
 				// Create a dodecahedron
-				v.init(-20,20,-20,20,-20,20);
-				v.plane(0,20*Phi,20);
-				v.plane(0,-20*Phi,20);
-				v.plane(0,20*Phi,-20);
-				v.plane(0,-20*Phi,-20);
-				v.plane(20,0,20*Phi);
-				v.plane(-20,0,20*Phi);
-				v.plane(20,0,-20*Phi);
-				v.plane(-20,0,-20*Phi);
-				v.plane(20*Phi,20,0);
-				v.plane(-20*Phi,20,0);
-				v.plane(20*Phi,-20,0);
-				v.plane(-20*Phi,-20,0);
+				v.init(-radius,radius,-radius,radius,-radius,radius);
+				v.plane(          0,  radius*Phi,      radius);
+				v.plane(          0, -radius*Phi,      radius);
+				v.plane(          0,  radius*Phi,     -radius);
+				v.plane(          0, -radius*Phi,     -radius);
+				v.plane(     radius,           0,  radius*Phi);
+				v.plane(    -radius,           0,  radius*Phi);
+				v.plane(     radius,           0, -radius*Phi);
+				v.plane(    -radius,           0, -radius*Phi);
+				v.plane( radius*Phi,      radius,           0);
+				v.plane(-radius*Phi,      radius,           0);
+				v.plane( radius*Phi,     -radius,           0);
+				v.plane(-radius*Phi,     -radius,           0);
 			};
 			bool point_inside(double x,double y,double z) {return true;}
 			bool cut_cell(voronoicell &c,double x,double y,double z) {
@@ -697,7 +697,7 @@ class container_dodecahedral : public container
 	};
 
 	container_dodecahedral(double ax_, double bx_, double ay_, double by_, double az_, double bz_,
-			  int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem);
+			  int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem, double radius);
 
 	private:
 		std::shared_ptr<wall_dodecahedral> w;

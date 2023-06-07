@@ -87,10 +87,10 @@ container::container(double ax_, double bx_, double ay_, double by_, double az_,
  * \param[in] init_mem the initial memory allocation for each block. */
 
 container_dodecahedral::container_dodecahedral(double ax_, double bx_, double ay_, double by_, double az_, double bz_,
-					 int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem)
+					 int nx_, int ny_, int nz_, bool xperiodic_, bool yperiodic_, bool zperiodic_, int init_mem, double radius)
 	: container(ax_, bx_, ay_, by_, az_, bz_, nx_, ny_, nz_, xperiodic_, yperiodic_, zperiodic_, init_mem)
 {
-	w.reset(new wall_dodecahedral());
+	w.reset(new wall_dodecahedral(radius));
 	add_wall(dynamic_cast<wall *>(w.get()));
 }
 
